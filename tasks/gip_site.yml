@@ -1,0 +1,66 @@
+- name: "Abort if SITE_SUPPORT_SITE or SITE_TIER is set (YAIM rule)"
+  ansible.builtin.assert:
+    that:
+      - (site_support_site | default('') | length) == 0
+      - (site_tier | default('') | length) == 0
+    fail_msg: "Neither SITE_SUPPORT_SITE nor SITE_TIER should be set any longer."
+
+- name: "Derive SITE_COUNTRY from site_loc (last comma-separated token)"
+  ansible.builtin.set_fact:
+    site_country: "{{ (site_loc.split(',') | last) | trim }}"
+
+- name: "Fix SITE_LON -> SITE_LONG key if present"
+  ansible.builtin.replace:
+    path: /etc/glite-info-static/site/site.cfg
+    regexp: '^SITE_LON\s*='
+    replace: 'SITE_LONG ='
+  ignore_errors: true
+
+- name: "Set site.cfg fields (YAIM sed replacements)"
+  ansible.builtin.replace:
+    path: /etc/glite-info-static/site/site.cfg
+    regexp: "^{{ item.key }}\\s*=.*$"
+    replace: "{{ item.key }} = {{ item.value }}"
+  loop:
+    - { key: "SITE_NAME",           value: "{{ site_name }}" }
+    - { key: "SITE_DESC",           value: "{{ site_desc }}" }
+    - { key: "SITE_WEB",            value: "{{ site_web }}" }
+    - { key: "SITE_LOC",            value: "{{ site_loc }}" }
+    - { key: "SITE_COUNTRY",        value: "{{ site_country }}" }
+    - { key: "SITE_LAT",            value: "{{ site_lat }}" }
+    - { key: "SITE_LONG",           value: "{{ site_long }}" }
+    - { key: "SITE_EMAIL",          value: "{{ site_email }}" }
+    - { key: "SITE_SECURITY_EMAIL", value: "{{ site_security_email }}" }
+    - { key: "SITE_SUPPORT_EMAIL",  value: "{{ site_support_email }}" }
+
+- name: "Remove all OTHERINFO lines (YAIM deletes then appends)"
+  ansible.builtin.lineinfile:
+    path: /etc/glite-info-static/site/site.cfg
+    regexp: '^OTHERINFO\s*='
+    state: absent
+
+- name: "Build OTHERINFO lines from site_other dict"
+  ansible.builtin.set_fact:
+    site_otherinfo_lines: >-
+      {{
+        site_otherinfo_lines | default([]) +
+        (
+          (
+            (item.value if (item.value is sequence and item.value is not string) else (item.value | string).split('|'))
+            | map('trim')
+            | reject('equalto','')
+            | map('regex_replace', '^(.*)$', 'OTHERINFO = ' ~ item.key ~ '=\\1')
+            | list
+          )
+        )
+      }}
+  loop: "{{ site_other | dict2items }}"
+
+- name: "Append OTHERINFO lines to end of site.cfg"
+  ansible.builtin.lineinfile:
+    path: /etc/glite-info-static/site/site.cfg
+    line: "{{ item }}"
+    insertafter: EOF
+    create: false
+  loop: "{{ site_otherinfo_lines | default([]) }}"
+

@@ -1,0 +1,7 @@
+[Service]
+Environment="SLAPD_CONF={{ slapd_conf }}"
+Environment="SLAPD={{ slapd }}"
+Environment="BDII_RAM_DISK={{ bdii_ram_disk }}"
+Environment="BDII_IPV6_SUPPORT={{ bdii_ipv6_support | default('no') }}"
+Environment="BDII_RAM_SIZE={{ bdii_ram_size | default('1500M') }}"
+

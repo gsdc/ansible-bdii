@@ -1,0 +1,30 @@
+- name: "Ensure systemd drop-in dir exists"
+  ansible.builtin.file:
+    path: /etc/systemd/system/bdii.service.d
+    state: directory
+    mode: "0755"
+
+- name: "Install systemd override env for bdii"
+  ansible.builtin.template:
+    src: bdii.override.conf.j2
+    dest: /etc/systemd/system/bdii.service.d/10-env.conf
+    mode: "0644"
+  notify:
+    - Systemd daemon-reload
+    - Restart bdii
+
+# (옵션) 구형 패키지 호환용 /etc/sysconfig/bdii도 함께 생성
+- name: "Optionally write /etc/sysconfig/bdii for compatibility"
+  ansible.builtin.copy:
+    dest: /etc/sysconfig/bdii
+    mode: "0644"
+    content: |
+      SLAPD_CONF={{ slapd_conf }}
+      SLAPD={{ slapd }}
+      BDII_RAM_DISK={{ bdii_ram_disk }}
+      BDII_IPV6_SUPPORT={{ bdii_ipv6_support | default('no') }}
+      BDII_RAM_SIZE={{ bdii_ram_size | default('1500M') }}
+  when: bdii_write_sysconfig_compat | bool
+  notify:
+    - Restart bdii
+

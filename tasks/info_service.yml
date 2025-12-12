@@ -1,0 +1,12 @@
+- name: "Ensure /etc/bdii/gip exists"
+  ansible.builtin.file:
+    path: /etc/bdii/gip
+    state: directory
+    mode: "0755"
+
+- name: "Write glite-info-site-defaults.conf (remove old keys by overwriting file)"
+  ansible.builtin.template:
+    src: glite-info-site-defaults.conf.j2
+    dest: /etc/bdii/gip/glite-info-site-defaults.conf
+    mode: "0644"
+

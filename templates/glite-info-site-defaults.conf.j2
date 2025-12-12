@@ -1,0 +1,3 @@
+SITE_NAME={{ (site_name | length > 0) | ternary(site_name, (ansible_fqdn.split('.', 1) | last)) }}
+SITE_BDII_HOST={{ (site_bdii_host | length > 0) | ternary(site_bdii_host, ansible_fqdn) }}
+

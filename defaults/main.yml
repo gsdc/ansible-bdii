@@ -1,0 +1,46 @@
+# --- YAIM 변수 대응 (필수) ---
+site_name: ""
+site_desc: ""
+site_web: ""
+site_loc: ""          # e.g. "Seoul, Korea"
+site_lat: ""
+site_long: ""
+site_email: ""
+site_security_email: ""
+site_support_email: ""
+
+# SITE_SUPPORT_SITE / SITE_TIER는 YAIM에서 금지
+site_support_site: ""   # 비어있어야 함
+site_tier: ""           # 비어있어야 함
+
+# SITE_OTHER_* -> Ansible에서는 dict로 받는 걸 권장
+# 값은 문자열(예: "EGEE|WLCG") 또는 리스트(["EGEE","WLCG"]) 허용
+site_other: {}          # 예: { GRID: "EGEE|WLCG", EGEE_ROC: "UK/I" }
+
+# --- BDII (gip/site-urls.conf) ---
+bdii_regions: []        # 예: ["PROD", "TEST"]
+bdii_region_urls: {}    # 예: { PROD: "ldap://x:2170/mds-vo-name=PROD,o=grid", TEST: "ldap://..." }
+
+# --- info service defaults ---
+site_bdii_host: ""      # 비우면 hostname -f
+# site_name 비우면 hostname -d (YAIM과 동일하게 처리)
+
+# --- config_bdii_6 ---
+bdii_breathe_time: ""
+bdii_read_timeout: ""
+bdii_archive_size: ""
+bdii_delete_delay: 0
+
+# bdii-slapd rootpw 치환
+bdii_passwd: ""
+
+# systemd 환경 변수 (YAIM의 /etc/sysconfig/bdii 내용 대체)
+slapd_conf: ""
+slapd: ""
+bdii_ram_disk: ""
+bdii_ipv6_support: "no"
+bdii_ram_size: "1500M"
+
+# 호환용 sysconfig 파일도 같이 만들지 여부(기본 false)
+bdii_write_sysconfig_compat: false
+

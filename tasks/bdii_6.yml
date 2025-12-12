@@ -1,0 +1,56 @@
+- name: "Assert required bdii.conf vars"
+  ansible.builtin.assert:
+    that:
+      - bdii_breathe_time is defined and (bdii_breathe_time | string | length) > 0
+      - bdii_read_timeout is defined and (bdii_read_timeout | string | length) > 0
+      - bdii_archive_size is defined and (bdii_archive_size | string | length) > 0
+    fail_msg: "Required: bdii_breathe_time, bdii_read_timeout, bdii_archive_size"
+
+- name: "Check /etc/bdii/bdii.conf exists"
+  ansible.builtin.stat:
+    path: /etc/bdii/bdii.conf
+  register: bdii_conf_stat
+
+- name: "Fail if bdii.conf missing"
+  ansible.builtin.fail:
+    msg: "No bdii.conf file found"
+  when: not bdii_conf_stat.stat.exists
+
+- name: "Backup bdii.conf -> bdii.conf.old (YAIM style)"
+  ansible.builtin.copy:
+    src: /etc/bdii/bdii.conf
+    dest: /etc/bdii/bdii.conf.old
+    remote_src: true
+    mode: preserve
+
+- name: "Set BDII_DELETE_DELAY default (YAIM default 0)"
+  ansible.builtin.set_fact:
+    bdii_delete_delay: "{{ bdii_delete_delay | default(0) }}"
+
+- name: "Update bdii.conf parameters"
+  ansible.builtin.replace:
+    path: /etc/bdii/bdii.conf
+    regexp: "^{{ item.key }}=.*$"
+    replace: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "BDII_BREATHE_TIME", value: "{{ bdii_breathe_time }}" }
+    - { key: "BDII_READ_TIMEOUT",  value: "{{ bdii_read_timeout }}" }
+    - { key: "BDII_DELETE_DELAY",  value: "{{ bdii_delete_delay }}" }
+    - { key: "BDII_ARCHIVE_SIZE",  value: "{{ bdii_archive_size }}" }
+  notify: Restart bdii
+
+- name: "Update rootpw in /etc/bdii/bdii-slapd.conf if present"
+  ansible.builtin.replace:
+    path: /etc/bdii/bdii-slapd.conf
+    regexp: "^(\\s*rootpw\\s+).*$"
+    replace: "\\1{{ bdii_passwd }}"
+  when: bdii_passwd is defined and (bdii_passwd | string | length) > 0
+  ignore_errors: true
+  notify: Restart bdii
+
+- name: "Enable and start bdii (systemd)"
+  ansible.builtin.systemd:
+    name: bdii
+    enabled: true
+    state: started
+

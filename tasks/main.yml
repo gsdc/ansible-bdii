@@ -1,0 +1,15 @@
+- name: "GIP site.cfg 설정"
+  ansible.builtin.import_tasks: gip_site.yml
+
+- name: "site-urls.conf 설정"
+  ansible.builtin.import_tasks: gip_bdii_site.yml
+
+- name: "glite-info-site-defaults.conf 설정"
+  ansible.builtin.import_tasks: info_service.yml
+
+- name: "systemd drop-in 환경 설정 (/etc/sysconfig 대체)"
+  ansible.builtin.import_tasks: systemd_env.yml
+
+- name: "bdii.conf 및 slapd 비밀번호/서비스 처리"
+  ansible.builtin.import_tasks: bdii_6.yml
+

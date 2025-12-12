@@ -1,0 +1,34 @@
+- hosts: bdii_nodes
+  become: true
+  roles:
+    - role: emi_bdii_site
+      vars:
+        site_name: "KISTI"
+        site_desc: "KISTI CMS T2"
+        site_web: "https://www.kisti.re.kr"
+        site_loc: "Daejeon, Korea"
+        site_lat: "36.374"
+        site_long: "127.365"
+        site_email: "admin@example.org"
+        site_security_email: "security@example.org"
+        site_support_email: "support@example.org"
+        site_other:
+          GRID: "EGEE|WLCG"
+          EGEE_ROC: "KR/KR"
+        bdii_regions: ["PROD"]
+        bdii_region_urls:
+          PROD: "ldap://bdii.example.org:2170/mds-vo-name=PROD,o=grid"
+
+        bdii_breathe_time: "120"
+        bdii_read_timeout: "300"
+        bdii_archive_size: "10"
+        bdii_delete_delay: 0
+
+        bdii_passwd: "secret"
+
+        slapd_conf: "/etc/bdii/bdii-slapd.conf"
+        slapd: "/usr/sbin/slapd"
+        bdii_ram_disk: "yes"
+        bdii_ipv6_support: "no"
+        bdii_ram_size: "1500M"
+
