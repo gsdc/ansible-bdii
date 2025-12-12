@@ -15,9 +15,9 @@
         site_other:
           GRID: "EGEE|WLCG"
           EGEE_ROC: "KR/KR"
-        bdii_regions: ["PROD"]
+        bdii_regions: ["BDII_SITE","HTCONDOR_CE","DCACHE_SE"]
         bdii_region_urls:
-          PROD: "ldap://bdii.example.org:2170/mds-vo-name=PROD,o=grid"
+          BDII_SITE: "ldap://bdii.example.org:2170/mds-vo-name=PROD,o=grid"
 
         bdii_breathe_time: "120"
         bdii_read_timeout: "300"

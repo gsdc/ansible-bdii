@@ -1,5 +1,5 @@
 {# YAIM: REGION  $BDII_${REGION}_URL #}
 {% for r in bdii_regions %}
-{{ r }}  {{ bdii_region_urls[r] | default('') }}
+BDII_{{ r }}_URL="{{ bdii_region_urls[r] | default('') }}"
 {% endfor %}
 
