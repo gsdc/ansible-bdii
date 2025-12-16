@@ -41,6 +41,3 @@ bdii_ram_disk: ""
 bdii_ipv6_support: "no"
 bdii_ram_size: "1500M"
 
-# 호환용 sysconfig 파일도 같이 만들지 여부(기본 false)
-bdii_write_sysconfig_compat: false
-

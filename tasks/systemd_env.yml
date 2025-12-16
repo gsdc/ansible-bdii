@@ -3,6 +3,8 @@
     path: /etc/systemd/system/bdii.service.d
     state: directory
     mode: "0755"
+  when:
+    - ansible_facts.service_mgr == "systemd"
 
 - name: "Install systemd override env for bdii"
   ansible.builtin.template:
@@ -12,6 +14,8 @@
   notify:
     - Systemd daemon-reload
     - Restart bdii
+  when:
+    - ansible_facts.service_mgr == "systemd"
 
 # (옵션) 구형 패키지 호환용 /etc/sysconfig/bdii도 함께 생성
 - name: "Optionally write /etc/sysconfig/bdii for compatibility"
@@ -24,7 +28,8 @@
       BDII_RAM_DISK={{ bdii_ram_disk }}
       BDII_IPV6_SUPPORT={{ bdii_ipv6_support | default('no') }}
       BDII_RAM_SIZE={{ bdii_ram_size | default('1500M') }}
-  when: bdii_write_sysconfig_compat | bool
   notify:
     - Restart bdii
+  when:
+    - ansible_facts.service_mgr != "systemd"
 
