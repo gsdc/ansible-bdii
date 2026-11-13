@@ -1,5 +1,8 @@
-{# YAIM: REGION  $BDII_${REGION}_URL #}
+{# glite-info-provider-ldap 형식: "<이름><공백>ldap://host:port/base" 한 줄에 하나.
+   YAIM 의 BDII_<REGION>_URL="..." (셸 변수) 형식은 파서가 무시하므로 쓰지 않는다. #}
+# {{ ansible_managed }}
 {% for r in bdii_regions %}
-BDII_{{ r }}_URL {{ bdii_region_urls[r] | default('') }}
+{% if bdii_region_urls[r] | default('') | length > 0 %}
+{{ r }} {{ bdii_region_urls[r] }}
+{% endif %}
 {% endfor %}
-

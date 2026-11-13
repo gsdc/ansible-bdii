@@ -4,6 +4,16 @@
     state: directory
     mode: "0755"
 
+- name: "Check bdii_region_urls (ldap:// URL, 공백 없는 이름)"
+  ansible.builtin.assert:
+    that:
+      - r is match('^[A-Za-z0-9_.-]+$')
+      - (bdii_region_urls[r] | default('')) is match('^ldap://\\S+$')
+    fail_msg: "bdii_regions[{{ r }}]: 이름은 공백 없이, URL 은 ldap://host:2170/mds-vo-name=...,o=grid 형식이어야 함"
+  loop: "{{ bdii_regions }}"
+  loop_control:
+    loop_var: r
+
 - name: "Write /etc/bdii/gip/site-urls.conf"
   ansible.builtin.template:
     src: site-urls.conf.j2
